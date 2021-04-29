@@ -1,10 +1,10 @@
-# System Administration System
+### School Administration System ###
 
-# Node version and local setup
+### Node version and local setup ###
 
 NodeJS version used: v12.13.0
 
-# Local setup instuctions
+### Local setup instuctions ###
 
 - Clone the repository either master/develop branch
 - After cloning, cd into the project directory and run `yarn` or `npm install`

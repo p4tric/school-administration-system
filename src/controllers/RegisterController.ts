@@ -1,8 +1,9 @@
 import Express, { RequestHandler } from 'express';
 import { BAD_REQUEST, NO_CONTENT } from 'http-status-codes';
 
-import { Clasz, Student, Subject, Teacher, ClassSubject,
-  ClassStudent, SubjectTeacher, ClassTeacher } from '../models/index';
+
+
+import { register } from '../services/index';
 
 import { APP_VERSION } from '../config/common';
 
@@ -10,6 +11,8 @@ const RegisterController = Express.Router();
 
 const registerHandler: RequestHandler = async (req, res) => {
   const { class: clasz, students, subject, teacher } = req.body;
+
+  console.log('[registerEgg] ', register.registerEgg());
 
   if (!teacher || !subject || !students || !clasz ||
     Object.keys(teacher).length < 2 ||
@@ -25,69 +28,30 @@ const registerHandler: RequestHandler = async (req, res) => {
 
   }
 
-  const [resClass, classCreated] = await Clasz.findOrCreate({
-    where: { classCode: clasz.classCode },
-    defaults: clasz
+  const registeredClass = await register.findCreateClass(clasz);
+  const registeredTeacher = await register.findCreateTeacher(teacher);
+  const registeredSubject = await register.findCreateSubject(subject);
+
+  const registeredClassTeacher = await register.findCreateClassTeacher({
+    teacherId: registeredTeacher.id,
+    claszId: registeredClass.id
   });
 
-  const [resTeacher, teacherCreated] = await Teacher.findOrCreate({
-    where: { email: teacher.email },
-    defaults: teacher
+  const registeredSubjectTeacher = await register.findCreateSubjectTeacher({
+    teacherId: registeredTeacher.id,
+    subjectId: registeredSubject.id
   });
 
-  const [resSubject, subjectCreated] = await Subject.findOrCreate({
-    where: { subjectCode: subject.subjectCode },
-    defaults: subject
-  });
-
-  const [resClassTeacher, classTeacherCreated] = await ClassTeacher.findOrCreate({
-    where: {
-      teacherId: resTeacher.id,
-      claszId: resClass.id
-    },
-    defaults: {
-      teacherId: resTeacher.id,
-      claszId: resClass.id
-    },
-  });
-
-  const [resSubjectTeacher, subjectTeacherCreated] = await SubjectTeacher.findOrCreate({
-    where: {
-      teacherId: resTeacher.id,
-      subjectId: resSubject.id
-    },
-    defaults: {
-      teacherId: resTeacher.id,
-      subjectId: resSubject.id
-    },
-  });
-
-  const [resClassSubject, classSubjectCreated] = await ClassSubject.findOrCreate({
-    where: {
-      claszId: resClass.id,
-      subjectId: resSubject.id
-    },
-    defaults: {
-      claszId: resClass.id,
-      subjectId: resSubject.id
-    },
+  const registeredClassSubject = await register.findCreateClassSubject({
+    claszId: registeredClass.id,
+    subjectId: registeredSubject.id
   });
 
   students.map(async (student: any) => {
-    const [resStudent, studentCreated] = await Student.findOrCreate({
-      where: { email: student.email },
-      defaults: student
-    });
-
-    const [resClassStudent, classStudentCreated] = await ClassStudent.findOrCreate({
-      where: {
-        studentId: resStudent.id,
-        claszId: resClass.id
-      },
-      defaults: {
-        studentId: resStudent.id,
-        claszId: resClass.id
-      }
+    const registeredStudent = await register.findCreateStudent(student);
+    const registeredClassStudent = await register.findCreateClassStudent({
+      studentId: registeredStudent.id,
+      claszId: registeredClass.id
     });
   });
 
