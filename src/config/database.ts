@@ -1,13 +1,15 @@
-import { Sequelize } from 'sequelize';
+// import { Sequelize } from 'sequelize-typescript';
 import Logger from './logger';
 
+const { Sequelize } = require('sequelize');
 const LOG = new Logger('database.ts');
+
 const {
   DB_HOST = 'localhost',
-  DB_PORT = '33306',
+  DB_PORT = '3306',
   DB_SCHEMA = 'school-administration-system',
   DB_USER = 'root',
-  DB_PW = 'password',
+  DB_PW = 'admin',
   DB_POOL_ACQUIRE = '30000',
   DB_POOL_IDLE = '10000',
   DB_POOL_MAX_CONN = '10',
@@ -15,7 +17,7 @@ const {
   DB_LOG_LEVEL = 'info',
 } = process.env
 
-const sequelize = new Sequelize(DB_SCHEMA, DB_USER, DB_PW, {
+export default new Sequelize(DB_SCHEMA, DB_USER, DB_PW, {
   dialect: 'mysql',
   host: DB_HOST,
   port: parseInt(DB_PORT),
@@ -26,10 +28,7 @@ const sequelize = new Sequelize(DB_SCHEMA, DB_USER, DB_PW, {
     min: parseInt(DB_POOL_MIN_CONN)
   },
   timezone: '+08:00',
-  logging: (msg) => {
+  logging: (msg: string) => {
     LOG.log(DB_LOG_LEVEL, msg);
-  }
+  },
 });
-
-export default sequelize;
-
