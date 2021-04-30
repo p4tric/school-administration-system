@@ -1,4 +1,5 @@
 
 import * as register from './register';
+import * as report from './report';
 
-export { register };
+export { register, report };

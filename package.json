@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "This is a system which School administrators and Teachers can perform administrative functions on their students",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "build:ts": "tsc",
     "prestart": "npm run start:services",
     "start": "ts-node ./src/server.ts",
